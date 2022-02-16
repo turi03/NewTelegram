@@ -1,0 +1,33 @@
+import urllib
+import telebot
+from bs4 import BeautifulSoup
+
+API_TOKEN = '5294406699:AAFPts8EipVHqHLvJZD8Eg5AS5xX66_ASlQ'
+bot = telebot.TeleBot(API_TOKEN)
+base="http://www.isarchimede.edu.it/Orario/"
+
+
+def aule(message):
+    parser = 'html.parser'
+    resp = urllib.request.urlopen("")
+
+    #parser = 'html.parser'
+        #resp = urllib.request.urlopen("http://pctoarchibotcomfravig.altervista.org/index.html%22)
+        #soup = BeautifulSoup(resp, parser, from_encoding=resp.info().get_param('charset'))
+        #for link in soup.find_all('a', href=True, string=message.text.upper()):
+         #   bot.reply_to(message, "ecco l' orario:")
+         #   link['href'] = link['href'].replace(" ", "%20")
+         #   bot.send_message(message.chat.id, link['href'])
+
+def parse_docenti(message,docente):
+    parser= 'html.parser'
+    resp = urllib.request.urlopen("http://www.isarchimede.edu.it/Orario/")
+    bot.send_message(message.chat.id,"ho aperto il sito")
+    soup = BeautifulSoup(resp, parser, from_encoding=resp.info().get_param('charset'))
+    bot.send_message(message.chat.id, "leggo il sito")
+    for link in soup.find_all('a', href=True, string=str(docente)): #Bovenzi Graziano
+        bot.send_message(message.chat.id, "cerco il prof"+str(docente))
+        bot.reply_to(message, "ecco l' orario: ")
+        link['href'] = link['href'].replace(" ", "%20")
+        risultato=base+link['href']
+        bot.send_message(message.chat.id,risultato)
