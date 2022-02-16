@@ -1,0 +1,97 @@
+import requests
+import telebot
+import Codice
+from pathlib import Path
+
+
+
+# parse per trovare docente trova la parola docente e finisce quando vede la parola aule
+# stessa cosa per tutte le atre cose mettere tutto in una stringa senza spazzi e tutte minuscole  cosi da facilitarci le cose
+
+API_TOKEN = '5294406699:AAFPts8EipVHqHLvJZD8Eg5AS5xX66_ASlQ'
+
+bot = telebot.TeleBot(API_TOKEN)
+
+
+# gestisce il comando start
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.reply_to(message, """Ciao benvenuto nel bot dell'orario dell'Archimede 
+    Che cosa le serve?""")
+    file = open('data.csv', 'w')
+    response = requests.get('http://www.isarchimede.edu.it/Orario/')
+    file.write(response.text)
+    file.close()
+
+
+@bot.message_handler(commands=['circolari'])
+def send_ok(message):
+    bot.send_message(message.chat.id, "https://t.me/isarchimede")
+
+
+# gestisce il comando help
+@bot.message_handler(commands=['help'])
+def send_help(message):
+    bot.reply_to(message, "ecco tutte le cose che posso fare : ")
+
+
+# gestisce comando aule
+@bot.message_handler(commands=['aule'])
+def aule(message):
+    Codice.aule(message)
+
+
+@bot.message_handler(commands=['orario'])
+def orario(message):
+    # /orario Graziano Bovenzi
+    s = message.text
+    comando = s.split(" ")
+    if(len(comando)<3):
+        nome = "" + comando[1]
+        Codice.parse_docenti(message, nome)
+
+    else:
+        cognome = "" + comando[1]
+        nome = "" + comando[2]
+        docente =cognome+" "+nome;
+        print(str(docente))
+        Codice.parse_docenti(message, docente)
+
+# gestisce il comando di stop
+@bot.message_handler(commands=['stop'])
+def send_ok(message):
+    bot.reply_to(message, """NON LASCIARMI PERPIACERE ♥""")
+
+
+# Handle all other messages with content_type 'text' (content_types defaults to ['text'])
+@bot.message_handler(func=lambda message: True)
+def echo_message(message):
+    if (message.text == 'ciao' or message.text == 'Ciao'):
+        bot.reply_to(message, "Ciao come va?")
+
+    elif (message.text == 'bene' or message.text == 'Bene'):
+        bot.reply_to(message, "Ne sono felice! come ti chiami?")
+
+    elif (message.text == 'omar' or message.text == 'gaia'):
+        bot.reply_to(message, "Ciao capo! mi sei mancato/a")
+
+    elif (message.text == 'maurizio'):
+        bot.reply_to(message, "Ciao mauri come va la fibra a vidalengo ?")
+
+    elif (
+            message.text == 'bovenzi' or message.text == 'Bovenzi' or message.text == 'graziano' or message.text == 'Graziano'):
+        bot.reply_to(message, "Buongiorno prof !!")
+
+    else:
+        bot.reply_to(message, "non ho capito cosa hai scritto, scrivi in italiano per favore")
+
+
+if __name__ == "__main__":
+    bot.polling(none_stop=True)
+
+#cognome = "" + comando[1]
+   # nome = "" + comando[2]
+  #  spazio=" "
+   # docente =cognome+" "+nome;
+  #  print(str(docente))
+  #  Codice.parse_docenti(message, docente)
